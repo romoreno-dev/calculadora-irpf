@@ -297,6 +297,27 @@
     .cmp-tbl .green-val{color:var(--green);font-weight:700}
     .save-tag{display:inline-block;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:4px;padding:.1rem .4rem;font-size:.73rem;font-weight:700;color:#059669}
 
+    /* ── Tabla variación salarios (tab 2) ── */
+    .var-tbl-wrap{overflow-x:auto;max-height:520px;overflow-y:auto;border-radius:8px;border:1px solid var(--g200);margin-top:.3rem}
+    .var-tbl{width:100%;border-collapse:collapse;font-size:.78rem;min-width:580px}
+    .var-tbl thead th{background:var(--g100);padding:.5rem .7rem;font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--g600);text-align:right;position:sticky;top:0;z-index:1;border-bottom:2px solid var(--g200);white-space:nowrap}
+    .var-tbl thead th:first-child{text-align:left}
+    .var-tbl td{padding:.38rem .7rem;border-bottom:1px solid var(--g100);text-align:right;white-space:nowrap;vertical-align:middle}
+    .var-tbl td:first-child{text-align:left;font-weight:600;color:var(--g800)}
+    .var-tbl tr:hover td{background:var(--g50)}
+    .var-smi-row td{background:#fffbeb}
+    .var-brk-row td{border-top:2px solid var(--g200)}
+    .var-badge{font-size:.6rem;font-weight:700;border-radius:3px;padding:.05rem .3rem;vertical-align:middle;margin-left:.3rem;display:inline-block}
+    .vb-smi{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
+    .vb-ded{background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd}
+    .var-red{color:#dc2626}
+    .var-blu{color:var(--primary);font-weight:700}
+    .var-eff{color:var(--g600)}
+    .d-hi{color:#059669;font-weight:700}
+    .d-md{color:#d97706;font-weight:700}
+    .d-lo{color:#dc2626;font-weight:700}
+    .var-marg{color:var(--g400);font-weight:500;font-size:.65rem;display:block}
+
     /* ══ RESPONSIVE 820px (tablet / móvil landscape) ══ */
     @media(max-width:820px){
       /* Layout */
@@ -617,6 +638,35 @@
         </li>
       </ul>
     </div>
+
+    <div class="card" style="margin-top:1.1rem">
+      <div class="ctitle">📋 Tabla de neto — cada 1.000€ de bruto (12k → 100k)</div>
+      <p style="font-size:.78rem;color:var(--g600);margin-bottom:.6rem">
+        <strong>Δ Neto/mes</strong>: cuánto sube el neto mensual (12 pagas) por cada 1.000€ más de bruto.
+        Las líneas más gruesas marcan cambios de tramo IRPF.
+      </p>
+      <div class="var-tbl-wrap">
+        <table class="var-tbl">
+          <thead><tr>
+            <th style="text-align:left">Bruto/año</th>
+            <th>SS/año</th>
+            <th>IRPF/año</th>
+            <th>Neto/año</th>
+            <th>Neto/mes</th>
+            <th>Tipo ef.</th>
+            <th>Δ Neto/mes</th>
+          </tr></thead>
+          <tbody id="var-tbody"></tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:1.1rem">
+        <div style="font-size:.72rem;font-weight:600;color:var(--g600);margin-bottom:.4rem">
+          Incremento de neto mensual por cada 1.000€ adicional de bruto:
+        </div>
+        <div style="position:relative;height:200px"><canvas id="delta-chart"></canvas></div>
+      </div>
+    </div>
   </div>
 
   <!-- ══════════ TAB 3: TICKET RESTAURANTE ══════════ -->
@@ -788,6 +838,7 @@ function calc(gross) {
 let pays = 12;
 let donutObj = null;
 let sChartObj = null;
+let varTableBuilt = false;
 
 // ════════════════════════════════════════════
 //  FORMATTERS
@@ -1240,7 +1291,10 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('pane-'+name).classList.add('active');
   btn.classList.add('active');
-  if (name==='chart'  && !sChartObj) buildSalaryChart();
+  if (name==='chart') {
+    if (!sChartObj)     buildSalaryChart();
+    if (!varTableBuilt) { buildVarTable(); varTableBuilt = true; }
+  }
   if (name==='ticket') updateTicketUI();
 }
 
@@ -1339,6 +1393,137 @@ function renderSavedList() {
 
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ════════════════════════════════════════════
+//  TAB 2 — TABLA VARIACIÓN NETO (cada 1.000€)
+// ════════════════════════════════════════════
+function buildVarTable() {
+  const tbody = document.getElementById('var-tbody');
+  if (!tbody) return;
+
+  let prevNet = null;
+  let html = '';
+  const chartLabels = [], chartDeltas = [], chartColors = [];
+
+  for (let g = 12000; g <= 100000; g += 1000) {
+    const r = calc(g);
+    const netMes  = r.net / 12;
+    const delta   = prevNet !== null ? (r.net - prevNet) / 12 : null;
+    const margPct = delta !== null ? (delta * 12 / 1000 * 100).toFixed(1) : null;
+
+    const isBrk = prevNet !== null && (() => {
+      const prev = calc(g - 1000);
+      return TRAMOS.some(b => b.min > 0 && prev.baseLiq < b.min && r.baseLiq >= b.min);
+    })();
+
+    const hasSMI = g <= SMI && g + 1000 > SMI;
+    const hasDed = g <= SMI_MAX_DED && g + 1000 > SMI_MAX_DED;
+
+    const badges = (hasSMI ? `<span class="var-badge vb-smi">SMI 2026</span>` : '')
+                 + (hasDed ? `<span class="var-badge vb-ded">↑ fin ded.</span>` : '');
+
+    const dCls = delta === null ? '' : margPct >= 70 ? 'd-hi' : margPct >= 55 ? 'd-md' : 'd-lo';
+
+    html += `<tr class="${hasSMI ? 'var-smi-row' : ''} ${isBrk ? 'var-brk-row' : ''}">
+      <td>${g.toLocaleString('es-ES')}€${badges}</td>
+      <td class="var-red">${fmt(r.ss)}</td>
+      <td class="var-red">${fmt(r.irpf)}</td>
+      <td class="var-blu">${fmt(r.net)}</td>
+      <td class="var-blu">${fmt(netMes)}</td>
+      <td class="var-eff">${((r.ss + r.irpf) / g * 100).toFixed(1)}%</td>
+      <td class="${dCls}">${delta !== null
+        ? `+${fmt(delta)}<span class="var-marg">${margPct}% de los 1.000€ extra</span>`
+        : '—'}</td>
+    </tr>`;
+
+    // Datos para el gráfico (primer punto sin delta → null)
+    chartLabels.push(g);
+    chartDeltas.push(delta !== null ? +delta.toFixed(2) : null);
+    chartColors.push(
+      delta === null    ? '#94a3b8'
+      : margPct >= 70  ? '#059669'
+      : margPct >= 55  ? '#d97706'
+                       : '#dc2626'
+    );
+
+    prevNet = r.net;
+  }
+
+  tbody.innerHTML = html;
+
+  // ── Gráfico de barras Δ Neto/mes ──
+  const smiPlugin = {
+    id: 'smiLineD',
+    afterDraw(chart) {
+      const { ctx, scales: { x, y } } = chart;
+      const smiIdx = chartLabels.findIndex(g => g <= SMI && g + 1000 > SMI);
+      if (smiIdx < 0) return;
+      const px = x.getPixelForValue(smiIdx);
+      ctx.save();
+      ctx.beginPath(); ctx.setLineDash([4, 3]);
+      ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5;
+      ctx.moveTo(px, y.top); ctx.lineTo(px, y.bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#f59e0b'; ctx.font = 'bold 9px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('SMI', px, y.top - 4);
+      ctx.restore();
+    }
+  };
+
+  new Chart(document.getElementById('delta-chart'), {
+    type: 'bar',
+    plugins: [smiPlugin],
+    data: {
+      labels: chartLabels,
+      datasets: [{
+        data: chartDeltas,
+        backgroundColor: chartColors,
+        borderRadius: 2,
+        borderSkipped: false,
+        barPercentage: 0.85,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(255,255,255,.97)', borderColor: '#e2e8f0',
+          borderWidth: 1, titleColor: '#1e293b', bodyColor: '#475569', padding: 10,
+          callbacks: {
+            title: items => `Bruto: ${chartLabels[items[0].dataIndex].toLocaleString('es-ES')}€/año`,
+            label: ctx => ctx.raw !== null
+              ? `  Δ Neto/mes: +${ctx.raw.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2})}€`
+              : '  —',
+            afterLabel: ctx => {
+              if (ctx.raw === null) return '';
+              const pct = (ctx.raw * 12 / 1000 * 100).toFixed(1);
+              return `  ${pct}% de los 1.000€ extra`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: '#f1f5f9' },
+          ticks: {
+            maxRotation: 0, font: { size: 10 },
+            callback: (_, i) => {
+              const g = chartLabels[i];
+              return g % 10000 === 0 ? (g / 1000) + 'k€' : '';
+            }
+          }
+        },
+        y: {
+          grid: { color: '#f1f5f9' },
+          title: { display: true, text: 'Δ Neto/mes (€)', font: { size: 10 }, color: '#64748b' },
+          ticks: { font: { size: 10 }, callback: v => v + '€' }
+        }
+      }
+    }
+  });
 }
 
 // ════════════════════════════════════════════
