@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora IRPF – Andalucía 2025</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --primary:      #1e40af;
+      --primary-lt:   #3b82f6;
+      --green:        #059669;
+      --red:          #dc2626;
+      --amber:        #d97706;
+      --purple:       #7c3aed;
+      --g50:  #f8fafc;
+      --g100: #f1f5f9;
+      --g200: #e2e8f0;
+      --g400: #94a3b8;
+      --g600: #475569;
+      --g800: #1e293b;
+      --r: 14px;
+      --sh:  0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+      --sh2: 0 4px 12px rgba(0,0,0,.09);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+         background:var(--g50);color:var(--g800);min-height:100vh;font-size:14px}
+
+    /* ── HEADER ── */
+    .hdr{background:linear-gradient(135deg,#1e3a8a,#1e40af 55%,#2563eb);
+         color:#fff;padding:1.4rem 2rem;display:flex;align-items:center;gap:.9rem}
+    .hdr-ico{font-size:2rem;line-height:1}
+    .hdr h1{font-size:1.3rem;font-weight:700;letter-spacing:-.3px}
+    .hdr p{font-size:.78rem;opacity:.75;margin-top:.15rem}
+    .hdr-badge{margin-left:auto;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+               border-radius:20px;padding:.3rem .85rem;font-size:.75rem;font-weight:700;white-space:nowrap}
+
+    /* ── TABS ── */
+    .tab-nav{background:#fff;border-bottom:2px solid var(--g200);padding:0 2rem;display:flex}
+    .tab-btn{padding:.85rem 1.3rem;border:none;background:none;cursor:pointer;
+             font-size:.85rem;font-weight:600;color:var(--g600);
+             border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;
+             display:flex;align-items:center;gap:.35rem}
+    .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+    .tab-btn:hover:not(.active){color:var(--g800);background:var(--g50)}
+
+    /* ── LAYOUT ── */
+    .page{max-width:1220px;margin:0 auto;padding:1.4rem 2rem}
+    .pane{display:none}.pane.active{display:block}
+    .g2{display:grid;grid-template-columns:370px 1fr;gap:1.2rem;align-items:start}
+
+    /* ── CARD ── */
+    .card{background:#fff;border-radius:var(--r);padding:1.35rem;
+          box-shadow:var(--sh);border:1px solid var(--g200)}
+    .card+.card{margin-top:1.1rem}
+    .ctitle{font-size:.73rem;font-weight:700;text-transform:uppercase;
+            letter-spacing:.07em;color:var(--g600);margin-bottom:.9rem;
+            display:flex;align-items:center;gap:.35rem}
+
+    /* ── INPUT ── */
+    .sal-wrap{display:flex;gap:.5rem;align-items:stretch}
+    .sal-wrap input[type=number]{flex:1;min-width:0;padding:.75rem .6rem;
+      font-size:1.75rem;font-weight:700;color:var(--primary);text-align:center;
+      border:2px solid var(--g200);border-radius:10px;outline:none;
+      transition:border-color .2s;-moz-appearance:textfield}
+    .sal-wrap input[type=number]::-webkit-outer-spin-button,
+    .sal-wrap input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+    .sal-wrap input[type=number]:focus{border-color:var(--primary-lt)}
+    .sal-btn{flex-shrink:0;width:46px;font-size:1.5rem;font-weight:700;
+             background:var(--g100);border:2px solid var(--g200);border-radius:10px;
+             color:var(--g800);cursor:pointer;transition:all .15s;
+             display:flex;align-items:center;justify-content:center;
+             user-select:none;-webkit-user-select:none}
+    .sal-btn:hover{background:var(--primary);border-color:var(--primary);color:#fff}
+    .sal-btn:active{transform:scale(.93)}
+    .slrow{margin-top:.75rem}
+    input[type=range]{width:100%;height:6px;accent-color:var(--primary);cursor:pointer;border-radius:4px}
+    .sl-lbls{display:flex;justify-content:space-between;font-size:.7rem;color:var(--g400);margin-top:.3rem}
+    .pays-g{display:flex;gap:.45rem;margin-top:.9rem}
+    .pays-btn{flex:1;padding:.48rem;border:2px solid var(--g200);border-radius:8px;
+              background:none;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--g600);
+              transition:all .18s}
+    .pays-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+    .pays-btn:hover:not(.active){border-color:var(--primary-lt);color:var(--primary)}
+
+    /* ── RESULT CARDS ── */
+    .rgrid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-top:.2rem}
+    .rbox{border-radius:10px;padding:.85rem 1rem;border:1px solid transparent}
+    .rbox.full{grid-column:span 2}
+    .rbox-lbl{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.6}
+    /* Monthly first (big), annual below (small) */
+    .rbox-mon{font-size:1.35rem;font-weight:800;display:block;margin-top:.18rem}
+    .rbox-sep{font-size:.72rem;opacity:.4;margin:0 .1rem}
+    .rbox-ann{font-size:.8rem;font-weight:600;opacity:.55;display:block;margin-top:.2rem}
+    .rbox-pays-lbl{font-size:.65rem;opacity:.45;margin-top:.05rem}
+
+    .rbox.gross{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+    .rbox.ss   {background:#fffbeb;border-color:#fde68a;color:#92400e}
+    .rbox.irpf {background:#fef2f2;border-color:#fecaca;color:#991b1b}
+    .rbox.net  {background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+
+    .ret-pill{display:flex;align-items:center;gap:.45rem;background:var(--g100);
+              border-radius:8px;padding:.5rem .9rem;margin-top:.8rem;
+              font-size:.82rem;color:var(--g600);font-weight:500}
+    .ret-pct{font-size:1.05rem;font-weight:800;color:var(--red);margin-left:auto}
+
+    /* ── STEP LIST ── */
+    .step-ul{list-style:none}
+    .step-li{display:flex;align-items:center;gap:.55rem;padding:.45rem 0;
+             border-bottom:1px solid var(--g100);font-size:.82rem}
+    .step-li:last-child{border-bottom:none}
+    .step-li.div{border-top:2px solid var(--g200);margin-top:.3rem;padding-top:.75rem}
+    .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .sname{flex:1;color:var(--g600)}
+    .sval{font-weight:700}
+    .sval.neg{color:var(--red)}.sval.pos{color:var(--green)}
+    .sval.neu{color:var(--g800)}.sval.big-b{color:var(--primary);font-size:.93rem}
+    .sval.big-g{color:var(--green);font-size:.93rem}
+
+    /* ── STACKED BAR ── */
+    .stack-bar-wrap{margin-top:1rem}
+    .stack-bar{display:flex;height:38px;border-radius:8px;overflow:hidden;gap:1px;background:var(--g200)}
+    .stack-seg{display:flex;align-items:center;justify-content:center;
+               font-size:.65rem;font-weight:700;color:#fff;
+               text-shadow:0 1px 2px rgba(0,0,0,.35);
+               transition:width .4s ease;overflow:hidden;white-space:nowrap;min-width:0}
+    .stack-seg.too-small{font-size:0} /* hide label if too narrow */
+    .stack-legend{display:flex;flex-wrap:wrap;gap:.5rem .9rem;margin-top:.7rem}
+    .leg-item{display:flex;align-items:center;gap:.35rem;font-size:.73rem;color:var(--g600)}
+    .leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+    /* ── ESCALERA IRPF compacta ── */
+    .cstair-hdr{display:grid;grid-template-columns:46px 118px 1fr 74px 74px 62px;
+                gap:.4rem;padding:.3rem 0 .4rem;font-size:.63rem;font-weight:700;
+                text-transform:uppercase;letter-spacing:.05em;color:var(--g400);
+                border-bottom:1px solid var(--g200);margin-bottom:.2rem}
+    .cstair-row{display:grid;grid-template-columns:46px 118px 1fr 74px 74px 62px;
+                gap:.4rem;align-items:center;padding:.42rem 0;
+                border-bottom:1px solid var(--g100);transition:opacity .2s}
+    .cstair-row:last-child{border-bottom:none}
+    .cstair-row.dim{opacity:.28}
+    .cstair-row.cur{background:rgba(59,130,246,.04);border-radius:6px;
+                    outline:1.5px solid rgba(59,130,246,.18);padding-left:.25rem;margin-left:-.25rem}
+    .cbadge{border-radius:5px;padding:.2rem .3rem;font-size:.78rem;font-weight:800;
+            color:#fff;text-align:center;line-height:1.2}
+    .crange{font-size:.71rem;color:var(--g600);font-weight:600;line-height:1.3}
+    .crange small{display:block;font-size:.63rem;color:var(--g400);font-weight:500;margin-top:.05rem}
+    .cbar-track{height:13px;background:var(--g100);border-radius:3px;overflow:hidden}
+    .cbar-fill{height:100%;border-radius:3px;transition:width .35s ease}
+    .camt{font-size:.78rem;font-weight:700;text-align:right;white-space:nowrap}
+    .camt.ctax{color:var(--red)}.camt.cbase{color:var(--primary)}.camt.cmon{color:var(--g600)}
+    .camt.cdash{color:var(--g400);font-weight:400}
+
+    /* ── pre-staircase funnel ── */
+    .sfunnel{background:var(--g50);border:1px solid var(--g200);border-radius:8px;
+             padding:.6rem .85rem;margin-bottom:.7rem}
+    .sfunnel-row{display:flex;justify-content:space-between;align-items:baseline;
+                 padding:.28rem 0;border-bottom:1px solid var(--g100);font-size:.78rem}
+    .sfunnel-row:last-of-type{border-bottom:none}
+    .sfunnel-bold{background:rgba(30,64,175,.06);border-radius:5px;
+                  padding:.35rem .4rem;margin:.25rem -.4rem 0;border-bottom:none!important}
+    .sfunnel-bold .sfunnel-lbl{font-weight:700;color:var(--primary)}
+    .sfunnel-bold .sfunnel-val{font-weight:800;font-size:.9rem}
+    .sfunnel-lbl{color:var(--g600)}
+    .sfunnel-val{font-weight:700;white-space:nowrap;margin-left:.5rem}
+    .sfunnel-note{font-size:.7rem;color:#78350f;background:#fffbeb;
+                  border-left:3px solid #f59e0b;border-radius:0 5px 5px 0;
+                  padding:.45rem .65rem;margin-top:.5rem;line-height:1.45}
+
+    /* total summary strip */
+    .ctotals{display:flex;align-items:center;flex-wrap:wrap;gap:.35rem .7rem;
+             margin-top:.85rem;padding:.75rem .9rem;background:var(--g100);
+             border-radius:8px;font-size:.8rem}
+    .ctotals .sep{color:var(--g400);font-weight:700;font-size:1rem}
+    .ctotals .tval{font-weight:800}
+    .ctotals .tval.tred{color:var(--red)}
+    .ctotals .tval.tgreen{color:var(--green)}
+    .ctotals .tlbl{color:var(--g600)}
+
+    /* note */
+    .note{background:#fffbeb;border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;
+          padding:.65rem .85rem;font-size:.76rem;color:#78350f;line-height:1.5;margin-top:.85rem}
+    .note strong{font-weight:700}
+
+    /* SS breakdown */
+    .ss-row{display:grid;grid-template-columns:105px 1fr 42px 68px;
+            gap:.45rem;align-items:center;padding:.38rem 0;
+            font-size:.78rem;border-bottom:1px solid var(--g100)}
+    .ss-row:last-child{border-bottom:none}
+    .ss-row.hdr{font-size:.67rem;font-weight:700;text-transform:uppercase;
+                letter-spacing:.05em;color:var(--g400);border-bottom:1px solid var(--g200)}
+    .btrack{height:16px;background:var(--g100);border-radius:4px;overflow:hidden}
+    .bfill{height:100%;border-radius:4px}
+
+    /* chart */
+    .chwrap{position:relative;height:290px}
+    .chwrap-lg{position:relative;height:460px}
+
+    /* ── SAVED SALARIES ── */
+    .saved-card{background:#fff;border-radius:var(--r);
+                box-shadow:var(--sh);border:1px solid var(--g200);
+                overflow:hidden;margin-top:1.1rem}
+    .saved-header{display:flex;align-items:center;gap:.5rem;
+                  padding:.85rem 1.1rem;border-bottom:1px solid var(--g200)}
+    .saved-header-title{font-size:.73rem;font-weight:700;text-transform:uppercase;
+                        letter-spacing:.07em;color:var(--g600);flex:1;
+                        display:flex;align-items:center;gap:.35rem}
+    .saved-add-btn{display:flex;align-items:center;gap:.3rem;
+                   background:var(--primary);color:#fff;border:none;
+                   border-radius:7px;padding:.38rem .75rem;font-size:.78rem;
+                   font-weight:700;cursor:pointer;transition:background .15s;white-space:nowrap}
+    .saved-add-btn:hover{background:#1d4ed8}
+
+    /* inline save form */
+    .saved-form{padding:.75rem 1.1rem;border-bottom:1px solid var(--g100);
+                background:var(--g50);display:none}
+    .saved-form.open{display:block}
+    .saved-form-row{display:flex;gap:.45rem;align-items:center}
+    .saved-form input[type=text]{flex:1;padding:.4rem .6rem;
+      border:1.5px solid var(--g200);border-radius:7px;font-size:.82rem;
+      outline:none;transition:border-color .2s}
+    .saved-form input[type=text]:focus{border-color:var(--primary-lt)}
+    .saved-form-ok{background:var(--green);color:#fff;border:none;
+                   border-radius:7px;padding:.4rem .75rem;font-size:.8rem;
+                   font-weight:700;cursor:pointer}
+    .saved-form-ok:hover{background:#047857}
+    .saved-form-cancel{background:none;border:none;color:var(--g400);
+                       cursor:pointer;font-size:1.1rem;padding:.2rem .4rem;line-height:1}
+
+    /* entries list */
+    .saved-empty{padding:1rem 1.1rem;font-size:.8rem;color:var(--g400);
+                 text-align:center;font-style:italic}
+    .saved-entry{display:flex;align-items:center;gap:.55rem;
+                 padding:.65rem 1.1rem;border-bottom:1px solid var(--g100);
+                 cursor:pointer;transition:background .15s;position:relative}
+    .saved-entry:last-child{border-bottom:none}
+    .saved-entry:hover{background:var(--g50)}
+    .saved-entry:hover .saved-load-hint{opacity:1}
+    .saved-pin{font-size:.9rem;flex-shrink:0;opacity:.5}
+    .saved-info{flex:1;min-width:0}
+    .saved-label{font-size:.82rem;font-weight:700;color:var(--g800);
+                 white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .saved-detail{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.18rem}
+    .saved-gross{font-size:.75rem;font-weight:600;color:var(--primary)}
+    .saved-net{font-size:.75rem;font-weight:700;color:var(--green)}
+    .saved-rate{font-size:.72rem;color:var(--g400)}
+    .saved-del{background:none;border:none;cursor:pointer;color:var(--g400);
+               font-size:1rem;padding:.15rem .3rem;border-radius:4px;
+               flex-shrink:0;line-height:1;transition:color .15s}
+    .saved-del:hover{color:var(--red);background:var(--red-light, #fef2f2)}
+    .saved-load-hint{position:absolute;right:2.2rem;font-size:.65rem;
+                     color:var(--primary);opacity:0;transition:opacity .15s;
+                     font-weight:600;pointer-events:none}
+    .saved-entry.active-entry{background:#eff6ff;border-left:3px solid var(--primary)}
+    .saved-entry.active-entry .saved-pin{opacity:1;color:var(--primary)}
+
+    /* ── TAB 2 ── */
+    #hover-detail{background:#fff;border-radius:10px;padding:1rem 1.2rem;
+                  box-shadow:var(--sh2);border:1px solid var(--g200);margin-top:1rem}
+    #hover-detail.hid{display:none}
+    .hgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+           gap:.55rem;margin-top:.75rem}
+    .hbox{border-radius:8px;padding:.65rem .85rem}
+    .hbox .hl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.6}
+    .hbox .hv{font-size:1rem;font-weight:800;margin-top:.15rem}
+    .hbox.h1{background:#eff6ff;color:#1d4ed8}.hbox.h2{background:#fffbeb;color:#92400e}
+    .hbox.h3{background:#fef2f2;color:#991b1b}.hbox.h4{background:#ecfdf5;color:#065f46}
+    .hbox.h5{background:#f5f3ff;color:#5b21b6}
+
+    @media(max-width:820px){
+      .g2{grid-template-columns:1fr}
+      .page{padding:1rem}
+      .hdr{padding:1.1rem 1rem;flex-wrap:wrap}
+      .hdr-badge{margin-left:0}
+      .tab-nav{padding:0 1rem;overflow-x:auto}
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-ico">🏛️</div>
+  <div>
+    <h1>Calculadora IRPF — Andalucía</h1>
+    <p>Seguridad Social (6,48%) + tarifa autonómica Andalucía + Mínimo Personal AEAT</p>
+  </div>
+  <span class="hdr-badge">📅 Ejercicio 2025</span>
+</header>
+
+<!-- TABS -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('calc',this)">📊 Calculadora</button>
+  <button class="tab-btn" onclick="switchTab('chart',this)">📈 Variación Salarios</button>
+</nav>
+
+<div class="page">
+
+  <!-- ══════════ TAB 1 ══════════ -->
+  <div id="pane-calc" class="pane active">
+    <div class="g2">
+
+      <!-- ── LEFT ── -->
+      <div>
+        <div class="card">
+          <div class="ctitle">💰 Salario Bruto Anual</div>
+          <div class="sal-wrap">
+            <button class="sal-btn" id="btn-minus" onclick="stepSal(-100)" onmousedown="startRepeat(-100)" onmouseup="stopRepeat()" onmouseleave="stopRepeat()">−</button>
+            <input type="number" id="sal" value="27000" min="0" max="500000" step="100"
+                   oninput="onSal(this.value)">
+            <button class="sal-btn" id="btn-plus" onclick="stepSal(100)" onmousedown="startRepeat(100)" onmouseup="stopRepeat()" onmouseleave="stopRepeat()">+</button>
+          </div>
+          <div class="slrow">
+            <input type="range" id="sl" min="0" max="120000" step="100" value="27000"
+                   oninput="onSl(this.value)">
+            <div class="sl-lbls"><span>0€</span><span>SMI 16.576€</span><span>60k</span><span>120k</span></div>
+          </div>
+          <div class="pays-g">
+            <button class="pays-btn active" id="p12" onclick="setPays(12)">12 pagas</button>
+            <button class="pays-btn" id="p14" onclick="setPays(14)">14 pagas</button>
+            <button class="pays-btn" id="pboth" onclick="setPays(0)">Ambas</button>
+          </div>
+          <div id="smi-badge" style="display:none;margin-top:.75rem;background:#ecfdf5;
+               border:1.5px solid #6ee7b7;border-radius:8px;padding:.55rem .9rem;
+               font-size:.8rem;font-weight:700;color:#065f46;align-items:center;gap:.4rem"></div>
+          <button class="saved-add-btn" style="margin-top:.85rem;width:100%;justify-content:center"
+                  onclick="openSaveForm()">📌 Guardar este salario</button>
+        </div>
+
+        <!-- Results -->
+        <div class="card">
+          <div class="ctitle">📋 Resultados</div>
+          <div class="rgrid" id="rg"></div>
+          <div class="ret-pill">
+            <span>Tipo de retención IRPF sobre nómina</span>
+            <span class="ret-pct" id="retpct">—</span>
+          </div>
+        </div>
+
+        <!-- Step -->
+        <div class="card">
+          <div class="ctitle">🔢 Cálculo paso a paso</div>
+          <ul class="step-ul" id="stepul"></ul>
+        </div>
+
+        <!-- SS -->
+        <div class="card">
+          <div class="ctitle">🛡️ Desglose Seguridad Social (6,48%)</div>
+          <div class="ss-row hdr"><span>Concepto</span><span></span><span style="text-align:center">Tipo</span><span style="text-align:right">Importe</span></div>
+          <div class="ss-row">
+            <span>Cont. Comunes</span>
+            <div class="btrack"><div class="bfill" style="width:72.5%;background:#3b82f6"></div></div>
+            <span style="text-align:center;font-weight:700">4,70%</span>
+            <span style="text-align:right;font-weight:700" id="ss-cc">—</span>
+          </div>
+          <div class="ss-row">
+            <span>Desempleo</span>
+            <div class="btrack"><div class="bfill" style="width:23.9%;background:#60a5fa"></div></div>
+            <span style="text-align:center;font-weight:700">1,55%</span>
+            <span style="text-align:right;font-weight:700" id="ss-de">—</span>
+          </div>
+          <div class="ss-row">
+            <span>Form. Prof.</span>
+            <div class="btrack"><div class="bfill" style="width:1.5%;background:#93c5fd"></div></div>
+            <span style="text-align:center;font-weight:700">0,10%</span>
+            <span style="text-align:right;font-weight:700" id="ss-fp">—</span>
+          </div>
+          <div class="ss-row">
+            <span>MEI</span>
+            <div class="btrack"><div class="bfill" style="width:2%;background:#bfdbfe"></div></div>
+            <span style="text-align:center;font-weight:700">0,13%</span>
+            <span style="text-align:right;font-weight:700" id="ss-mei">—</span>
+          </div>
+        </div>
+
+        <!-- Saved salaries panel -->
+        <div class="saved-card" id="saved-card">
+          <div class="saved-header">
+            <span class="saved-header-title">📌 Salarios guardados</span>
+            <button class="saved-add-btn" onclick="openSaveForm()">+ Guardar actual</button>
+          </div>
+          <!-- Inline save form -->
+          <div class="saved-form" id="saved-form">
+            <div style="font-size:.73rem;color:var(--g600);margin-bottom:.45rem">
+              Guardando <strong id="save-form-gross"></strong> — ponle un nombre (opcional):
+            </div>
+            <div class="saved-form-row">
+              <input type="text" id="save-label" placeholder="Ej: Oferta empresa X, sueldo actual…"
+                     maxlength="40" onkeydown="if(event.key==='Enter')confirmSave();if(event.key==='Escape')closeSaveForm()">
+              <button class="saved-form-ok" onclick="confirmSave()">✓ Guardar</button>
+              <button class="saved-form-cancel" onclick="closeSaveForm()" title="Cancelar">×</button>
+            </div>
+          </div>
+          <!-- Entries list -->
+          <div id="saved-list"></div>
+        </div>
+      </div>
+
+      <!-- ── RIGHT ── -->
+      <div>
+        <!-- Donut -->
+        <div class="card">
+          <div class="ctitle">🥧 Distribución del bruto</div>
+          <div class="chwrap"><canvas id="donut"></canvas></div>
+        </div>
+
+        <!-- Staircase -->
+        <div class="card">
+          <div class="ctitle">🪜 Escalera de tramos IRPF — Andalucía</div>
+
+          <!-- Stacked bar deductions -->
+          <div class="stack-bar-wrap">
+            <div style="font-size:.72rem;font-weight:600;color:var(--g600);margin-bottom:.4rem">
+              Cómo se reparte cada euro de tu salario bruto:
+            </div>
+            <div class="stack-bar" id="stkbar"></div>
+            <div class="stack-legend" id="stkleg"></div>
+          </div>
+
+          <!-- Compact staircase table -->
+          <div style="font-size:.72rem;font-weight:600;color:var(--g600);margin:.9rem 0 .3rem">
+            Detalle por tramo (sobre base liquidable):
+          </div>
+          <div id="stairwrap"></div>
+
+          <!-- Totals strip -->
+          <div class="ctotals" id="ctotals"></div>
+
+          <div class="note" id="stair-note"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 2 ══════════ -->
+  <div id="pane-chart" class="pane">
+    <div class="card">
+      <div class="ctitle">📈 Evolución neto mensual (12 pagas) · SMI → 100.000€ brutos/año · Andalucía</div>
+      <p style="font-size:.8rem;color:var(--g600);margin-bottom:1.1rem">
+        Pasa el ratón sobre el gráfico para ver el detalle. La curva refleja los tramos progresivos y la reducción por rendimientos del trabajo para salarios bajos.
+      </p>
+      <div class="chwrap-lg"><canvas id="sChart"></canvas></div>
+    </div>
+
+    <div id="hover-detail" class="hid">
+      <strong id="htitle" style="font-size:.88rem;color:var(--g800)">Bruto anual: —</strong>
+      <div class="hgrid" id="hgrid"></div>
+    </div>
+
+    <div class="card" style="margin-top:1.1rem">
+      <div class="ctitle">ℹ️ Claves del gráfico</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:.55rem">
+        <li style="font-size:.8rem;color:var(--g600);display:flex;gap:.5rem">
+          <span style="color:#059669;font-weight:800">—</span>
+          <span><strong>Neto mensual:</strong> lo que recibes en cuenta.</span>
+        </li>
+        <li style="font-size:.8rem;color:var(--g600);display:flex;gap:.5rem">
+          <span style="color:#dc2626;font-weight:800">—</span>
+          <span><strong>IRPF mensual:</strong> retención. El escalón visible ~20k es la reducción por rendimientos del trabajo (Art. 20 LIRPF, hasta 6.498€ para rentas bajas).</span>
+        </li>
+        <li style="font-size:.8rem;color:var(--g600);display:flex;gap:.5rem">
+          <span style="color:#d97706;font-weight:800">—</span>
+          <span><strong>Seg. Social:</strong> perfectamente lineal (6,48% fijo).</span>
+        </li>
+        <li style="font-size:.8rem;color:var(--g600);display:flex;gap:.5rem">
+          <span style="color:#7c3aed;font-weight:800">- -</span>
+          <span><strong>Tipo efectivo total</strong> (SS+IRPF) en eje derecho. Andalucía es significativamente más baja que la media nacional en tramos 2 y 3.</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+//  CONSTANTES AEAT + ANDALUCÍA 2024/2025
+// ════════════════════════════════════════════
+
+const SS_CC  = 0.0470;
+const SS_DE  = 0.0155;
+const SS_FP  = 0.0010;
+const SS_MEI = 0.0013;
+const SS_TOT = SS_CC + SS_DE + SS_FP + SS_MEI; // 0.0648
+
+const GASTOS  = 2000;
+const MIN_PER = 5550;
+const SMI     = 16576;   // SMI 2025/2026: 1.184€/mes × 14 pagas
+
+/*
+ * IRPF Andalucía 2024 — tarifa COMBINADA (estatal + autonómica Andalucía)
+ *
+ * Estado (Art.63 LIRPF):  9.50 | 12.00 | 15.00 | 18.50 | 22.50 | 24.50
+ * Andalucía autonómica:   9.50 | 11.50 | 14.75 | 18.50 | 22.50 | 24.50
+ * ─────────────────────── ──── | ───── | ───── | ───── | ───── | ─────
+ * Combinada:             19.00 | 23.50 | 29.75 | 37.00 | 45.00 | 49.00
+ *
+ * Tramos 2 y 3 reducidos respecto a la media nacional (24% y 30%)
+ * gracias a la rebaja autonómica andaluza (ley 5/2021 y presupuestos 2023/24).
+ */
+const TRAMOS = [
+  { min:      0, max:  12450, rate: 0.1900, stR: 0.0950, andR: 0.0950,
+    label:'0 – 12.450€',       color:'#22c55e', dark:'#15803d', bg:'#f0fdf4' },
+  { min:  12450, max:  20200, rate: 0.2350, stR: 0.1200, andR: 0.1150,
+    label:'12.450 – 20.200€',  color:'#eab308', dark:'#a16207', bg:'#fefce8' },
+  { min:  20200, max:  35200, rate: 0.2975, stR: 0.1500, andR: 0.1475,
+    label:'20.200 – 35.200€',  color:'#f97316', dark:'#c2410c', bg:'#fff7ed' },
+  { min:  35200, max:  60000, rate: 0.3700, stR: 0.1850, andR: 0.1850,
+    label:'35.200 – 60.000€',  color:'#ef4444', dark:'#b91c1c', bg:'#fef2f2' },
+  { min:  60000, max: 300000, rate: 0.4500, stR: 0.2250, andR: 0.2250,
+    label:'60.000 – 300.000€', color:'#dc2626', dark:'#991b1b', bg:'#fef2f2' },
+  { min: 300000, max: Infinity,rate: 0.4700, stR: 0.2450, andR: 0.2250,
+    label:'> 300.000€',        color:'#991b1b', dark:'#7f1d1d', bg:'#fef2f2' },
+];
+
+// ════════════════════════════════════════════
+//  CÁLCULO CORE
+// ════════════════════════════════════════════
+
+function taxOn(amount) {
+  let t = 0;
+  for (const b of TRAMOS) {
+    if (amount <= b.min) break;
+    t += (Math.min(amount, b.max) - b.min) * b.rate;
+  }
+  return Math.max(0, t);
+}
+
+function redTrabajo(rnPrev) {
+  if (rnPrev <= 0)       return 0;
+  if (rnPrev <= 14047.5) return 6498;
+  if (rnPrev <= 19747.5) return 6498 - 1.14 * (rnPrev - 14047.5);
+  return 0;
+}
+
+// Deducción por obtención de rendimientos del trabajo (Art. 80 bis LIRPF)
+// Se aplica sobre la CUOTA (no sobre la base), reduciendo el IRPF final.
+//   ≤ SMI (16.576€):         340 €
+//   SMI < gross < 18.276€:   lineal → 340 × (18.276 - gross) / 1.700
+//   ≥ 18.276€:               0 €
+const SMI_MAX_DED = 18276;
+function deduccionSMI(gross) {
+  if (gross <= SMI)         return 340;
+  if (gross >= SMI_MAX_DED) return 0;
+  return 340 * (SMI_MAX_DED - gross) / (SMI_MAX_DED - SMI);
+}
+
+function calc(gross) {
+  if (gross <= 0) return { gross:0,ss:0,irpf:0,net:0,retRate:0,
+    rnPrev:0,redT:0,baseLiq:0,taxBase:0,taxMin:0,dedSMI:0 };
+  const ss      = gross * SS_TOT;
+  const rnPrev  = gross - ss - GASTOS;
+  const redT    = Math.max(0, redTrabajo(Math.max(0, rnPrev)));
+  const baseLiq = Math.max(0, rnPrev - redT);
+  const taxBase = taxOn(baseLiq);
+  const taxMin  = taxOn(MIN_PER);
+  const dedSMI  = deduccionSMI(gross);
+  const irpf    = Math.max(0, taxBase - taxMin - dedSMI);
+  const net     = gross - ss - irpf;
+  return { gross, ss, irpf, net, retRate: gross>0?(irpf/gross)*100:0,
+           rnPrev, redT, baseLiq, taxBase, taxMin, dedSMI };
+}
+
+// ════════════════════════════════════════════
+//  ESTADO
+// ════════════════════════════════════════════
+let pays = 12;
+let donutObj = null;
+let sChartObj = null;
+
+// ════════════════════════════════════════════
+//  FORMATTERS
+// ════════════════════════════════════════════
+const fmt = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+const pct = n => n.toFixed(2) + '%';
+
+// ════════════════════════════════════════════
+//  UI PRINCIPAL
+// ════════════════════════════════════════════
+function updateUI(gross) {
+  const r = calc(gross);
+  const p = pays === 0 ? 12 : pays;
+
+  // SS items
+  document.getElementById('ss-cc').textContent  = fmt(gross * SS_CC);
+  document.getElementById('ss-de').textContent  = fmt(gross * SS_DE);
+  document.getElementById('ss-fp').textContent  = fmt(gross * SS_FP);
+  document.getElementById('ss-mei').textContent = fmt(gross * SS_MEI);
+
+  // Retention
+  document.getElementById('retpct').textContent = pct(r.retRate);
+
+  // SMI badge
+  const smiBadge = document.getElementById('smi-badge');
+  if (smiBadge) {
+    const hasDed = r.dedSMI > 0;
+    smiBadge.style.display = hasDed ? 'flex' : 'none';
+    if (hasDed) {
+      const label = r.gross <= SMI
+        ? `✅ Salario ≤ SMI — Deducción Art.80 bis: ${fmt(r.dedSMI)}`
+        : `📉 Deducción SMI parcial (Art.80 bis): ${fmt(r.dedSMI)} (desaparece a los ${SMI_MAX_DED.toLocaleString('es-ES')}€)`;
+      smiBadge.textContent = label;
+    }
+  }
+
+  renderResults(r, p);
+  renderSteps(r, p);
+  renderStaircase(r, p);
+  renderStackedBar(r);
+  updateDonut(r);
+}
+
+// ── Results grid ──
+function renderResults(r, p) {
+  // Monthly is the hero; annual is the footnote
+  function row(annual) {
+    if (pays === 0) {
+      return `
+        <span class="rbox-mon">
+          ${fmt(annual/12)}<span class="rbox-sep">/mes</span>
+          <span style="font-size:.72rem;opacity:.45;margin-left:.5rem">· 12p</span>
+        </span>
+        <span class="rbox-mon" style="margin-top:.2rem">
+          ${fmt(annual/14)}<span class="rbox-sep">/mes</span>
+          <span style="font-size:.72rem;opacity:.45;margin-left:.5rem">· 14p</span>
+        </span>
+        <span class="rbox-ann">${fmt(annual)} / año</span>`;
+    }
+    return `
+      <span class="rbox-mon">${fmt(annual/p)}<span class="rbox-sep">/mes</span></span>
+      <span class="rbox-ann">${fmt(annual)} / año · ${p} pagas</span>`;
+  }
+
+  document.getElementById('rg').innerHTML = `
+    <div class="rbox gross full">
+      <div class="rbox-lbl">Sueldo Bruto</div>
+      ${row(r.gross)}
+    </div>
+    <div class="rbox ss">
+      <div class="rbox-lbl">Seguridad Social</div>
+      ${row(r.ss)}
+    </div>
+    <div class="rbox irpf">
+      <div class="rbox-lbl">IRPF</div>
+      ${row(r.irpf)}
+    </div>
+    <div class="rbox net full">
+      <div class="rbox-lbl">Sueldo Neto</div>
+      ${row(r.net)}
+    </div>
+  `;
+}
+
+// ── Paso a paso ──
+function renderSteps(r, p) {
+  const items = [
+    {dot:'#3b82f6', name:'Salario bruto anual', val:r.gross,    cls:'big-b'},
+    {dot:'#f59e0b', name:`− Seguridad Social (${(SS_TOT*100).toFixed(2)}%)`,
+                                                 val:-r.ss,     cls:'neg'},
+    {dot:'#8b5cf6', name:'− Gastos deducibles trabajo',
+                                                 val:-GASTOS,   cls:'neg'},
+    {dot:'#64748b', name:'= Rendimiento neto previo',
+                                                 val:r.rnPrev,  cls:'neu', div:true},
+  ];
+  if (r.redT > 0) items.push(
+    {dot:'#10b981', name:'− Reducción rendimientos trabajo (Art.20)',
+                                                 val:-r.redT,   cls:'neg'}
+  );
+  items.push(
+    {dot:'#64748b', name:'= Base liquidable IRPF', val:r.baseLiq, cls:'neu', div:true},
+    {dot:'#ef4444', name:'Cuota íntegra (suma tramos)',val:-r.taxBase, cls:'neg'},
+    {dot:'#10b981', name:'+ Crédito mínimo personal (5.550€)', val:r.taxMin, cls:'pos'},
+  );
+  if (r.dedSMI > 0) items.push(
+    {dot:'#059669', name:`+ Deducción rendimientos trabajo (Art.80 bis)`, val:r.dedSMI, cls:'pos'}
+  );
+  items.push(
+    {dot:'#dc2626', name:'= IRPF a retener',       val:-r.irpf,  cls:'neg', div:true},
+    {dot:'#059669', name:'= NETO ANUAL',            val:r.net,    cls:'big-g'},
+  );
+
+  document.getElementById('stepul').innerHTML = items.map(it=>`
+    <li class="step-li ${it.div?'div':''}">
+      <div class="dot" style="background:${it.dot}"></div>
+      <span class="sname">${it.name}</span>
+      <span class="sval ${it.cls}">${fmt(Math.abs(it.val))}</span>
+    </li>`).join('');
+}
+
+// ── Barra apilada ──
+function renderStackedBar(r) {
+  if (r.gross <= 0) { document.getElementById('stkbar').innerHTML=''; return; }
+
+  // IRPF per bracket
+  const bracketTaxes = [];
+  let prevCumTax = 0;
+  for (const b of TRAMOS) {
+    const inB = Math.max(0, Math.min(r.baseLiq, b.max) - b.min);
+    if (inB <= 0 && b.min >= r.baseLiq) break;
+    const bTax = inB * b.rate;
+    if (bTax > 0) bracketTaxes.push({ label: `IRPF T${bracketTaxes.length+1}`, tax: bTax, color: b.dark });
+  }
+
+  // We show: SS | bracket taxes | net
+  const segments = [];
+  segments.push({ label:'Seg. Social', amount: r.ss, color:'#d97706' });
+  bracketTaxes.forEach((bt,i) => segments.push({
+    label: bt.label, amount: bt.tax, color: bt.color
+  }));
+  segments.push({ label:'Neto', amount: Math.max(0,r.net), color:'#059669' });
+
+  const total = r.gross;
+  let barHtml = '';
+  let legHtml = '';
+  for (const seg of segments) {
+    const w = (seg.amount / total) * 100;
+    barHtml += `<div class="stack-seg${w<5?' too-small':''}"
+      style="width:${w.toFixed(2)}%;background:${seg.color}"
+      title="${seg.label}: ${fmt(seg.amount)} (${((seg.amount/total)*100).toFixed(1)}%)"
+    >${w>=5 ? seg.label : ''}</div>`;
+    legHtml += `<div class="leg-item">
+      <div class="leg-dot" style="background:${seg.color}"></div>
+      <span><strong>${seg.label}</strong> ${fmt(seg.amount)} · ${((seg.amount/total)*100).toFixed(1)}%</span>
+    </div>`;
+  }
+  document.getElementById('stkbar').innerHTML = barHtml;
+  document.getElementById('stkleg').innerHTML = legHtml;
+}
+
+// ── Escalera compacta ──
+function renderStaircase(r, p) {
+  const { gross, ss, rnPrev, redT, baseLiq, taxBase, taxMin, irpf } = r;
+
+  // ── FUNNEL pre-escalera ──
+  // Muestra qué cantidad entra en los tramos
+  const funnelRows = [
+    { lbl:'Bruto anual',              val: gross,    color:'#1d4ed8', minus:false },
+    { lbl:`− Seg. Social (6,48%)`,    val: ss,       color:'#92400e', minus:true  },
+    { lbl:'− Gastos deducibles (Art.19)', val: GASTOS, color:'#7c3aed', minus:true },
+  ];
+  if (redT > 0) funnelRows.push(
+    { lbl:`− Reducción rendimientos trabajo (Art.20)`, val: redT, color:'#059669', minus:true }
+  );
+  funnelRows.push(
+    { lbl:'= BASE LIQUIDABLE → entra en los tramos', val: baseLiq, color:'#1e40af', minus:false, bold:true }
+  );
+
+  let funnelHtml = `<div class="sfunnel">`;
+  for (const row of funnelRows) {
+    funnelHtml += `<div class="sfunnel-row ${row.bold?'sfunnel-bold':''}">
+      <span class="sfunnel-lbl">${row.lbl}</span>
+      <span class="sfunnel-val" style="color:${row.color}">${row.minus?'−':''}${fmt(Math.abs(row.val))}</span>
+    </div>`;
+  }
+  funnelHtml += `</div>`;
+
+  // ── Escalera ──
+  let stairHtml = `<div class="cstair-hdr">
+    <span>Tipo</span><span>Tramo</span><span>% del tramo usado</span>
+    <span style="text-align:right">Base</span>
+    <span style="text-align:right">IRPF</span>
+    <span style="text-align:right">/mes</span>
+  </div>`;
+
+  let shownFuture = false;
+  for (const b of TRAMOS) {
+    const inB = Math.max(0, Math.min(baseLiq, b.max) - b.min);
+    const size = b.max === Infinity ? Math.max(inB, 1) : b.max - b.min;
+    const fillPct = Math.min(100, inB > 0 ? (inB / size) * 100 : 0);
+    const taxH = inB * b.rate;
+    const active = inB > 0;
+    const isCur = active && (b.max === Infinity || baseLiq < b.max);
+
+    if (!active) { if (shownFuture) break; shownFuture = true; }
+
+    const andLabel = b.andR !== b.stR
+      ? `AND ${(b.andR*100).toFixed(2)}% + EST ${(b.stR*100).toFixed(2)}%`
+      : `EST+AND ${(b.stR*100).toFixed(2)}%`;
+
+    stairHtml += `<div class="cstair-row ${!active?'dim':''} ${isCur?'cur':''}">
+      <div class="cbadge" style="background:${b.dark}">${(b.rate*100).toFixed(1)}%</div>
+      <div class="crange">${b.label}<small>${andLabel}</small></div>
+      <div class="cbar-track"><div class="cbar-fill" style="width:${fillPct.toFixed(1)}%;background:${b.dark}"></div></div>
+      ${active
+        ? `<span class="camt cbase">${fmt(inB)}</span>
+           <span class="camt ctax">${fmt(taxH)}</span>
+           <span class="camt cmon">−${fmt(taxH/p)}</span>`
+        : `<span class="camt cdash">—</span><span class="camt cdash">—</span><span class="camt cdash">—</span>`}
+    </div>`;
+  }
+
+  document.getElementById('stairwrap').innerHTML = funnelHtml + stairHtml;
+
+  // Totals strip
+  const dedSMIHtml = r.dedSMI > 0
+    ? `<span class="sep">−</span>
+       <span class="tlbl">Ded. Art.80 bis (SMI):</span>
+       <span class="tval tgreen">${fmt(r.dedSMI)}</span>`
+    : '';
+  document.getElementById('ctotals').innerHTML = `
+    <span class="tlbl">Cuota íntegra:</span>
+    <span class="tval tred">${fmt(taxBase)}</span>
+    <span class="sep">−</span>
+    <span class="tlbl">Crédito mínimo personal:</span>
+    <span class="tval tgreen">${fmt(taxMin)}</span>
+    ${dedSMIHtml}
+    <span class="sep">=</span>
+    <span class="tlbl">IRPF a retener:</span>
+    <span class="tval tred">${fmt(irpf)}</span>
+    <span class="tlbl" style="margin-left:.3rem;font-size:.72rem">(${fmt(irpf/p)}/mes)</span>
+  `;
+
+  let note = `<strong>Mínimo personal:</strong> crédito fiscal de ${fmt(taxMin)} (5.550€ × 19%, siempre al tipo del primer tramo). Andalucía: tipos reducidos en tramo 2 (23,5% vs 24%) y tramo 3 (29,75% vs 30%).`;
+  if (redT > 0) note += ` Reducción Art.20: ${fmt(redT)}.`;
+  if (r.dedSMI > 0) {
+    note += r.gross <= SMI
+      ? ` <strong>Deducción Art.80 bis (SMI): ${fmt(r.dedSMI)}</strong> — protección total para salarios al nivel del SMI.`
+      : ` <strong>Deducción Art.80 bis parcial: ${fmt(r.dedSMI)}</strong> — desaparece progresivamente hasta los ${SMI_MAX_DED.toLocaleString('es-ES')}€.`;
+  }
+  document.getElementById('stair-note').innerHTML = note;
+}
+
+// ════════════════════════════════════════════
+//  DONUT CHART
+// ════════════════════════════════════════════
+function updateDonut(r) {
+  const pOf = v => r.gross>0 ? ((v/r.gross)*100).toFixed(1)+'%' : '—';
+  const data = {
+    labels:['Neto','Seg. Social','IRPF'],
+    datasets:[{
+      data:[Math.max(0,r.net), r.ss, r.irpf],
+      backgroundColor:['#059669','#d97706','#dc2626'],
+      borderColor:'#fff', borderWidth:3, hoverOffset:8,
+    }]
+  };
+  if (donutObj) { donutObj.data=data; donutObj.update('none'); return; }
+  donutObj = new Chart(document.getElementById('donut'),{
+    type:'doughnut', data,
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'62%',
+      plugins:{
+        legend:{ position:'bottom', labels:{
+          font:{size:12,weight:'600'}, padding:14,
+          generateLabels: chart => {
+            const ds = chart.data.datasets[0];
+            const total = ds.data.reduce((a,b)=>a+b, 0);
+            return chart.data.labels.map((lbl,i)=>({
+              text:`${lbl} — ${total>0?((ds.data[i]/total)*100).toFixed(1):'0'}%`,
+              fillStyle:ds.backgroundColor[i],
+              strokeStyle:'#fff', lineWidth:2, index:i,
+            }));
+          }
+        }},
+        tooltip:{ callbacks:{ label: ctx=>{
+          const ds=ctx.chart.data.datasets[0];
+          const total=ds.data.reduce((a,b)=>a+b,0);
+          const pct=total>0?((ctx.raw/total)*100).toFixed(1):'0';
+          return `  ${ctx.label}: ${fmt(ctx.raw)} (${pct}%)`;
+        }}}
+      }
+    }
+  });
+}
+
+// ════════════════════════════════════════════
+//  TAB 2 — SALARY CHART
+// ════════════════════════════════════════════
+function buildSalaryChart() {
+  const SMI = 16576;
+  const labels=[], nets=[], irpfs=[], sss=[], effs=[];
+  for (let g=12000; g<=100000; g+=500) {
+    const r = calc(g);
+    labels.push(g);
+    nets.push(+(r.net/12).toFixed(2));
+    irpfs.push(+(r.irpf/12).toFixed(2));
+    sss.push(+(r.ss/12).toFixed(2));
+    effs.push(+((r.ss+r.irpf)/g*100).toFixed(2));
+  }
+
+  // SMI annotation (simple vertical line as hidden dataset + custom plugin)
+  const smiPlugin = {
+    id:'smiLine',
+    afterDraw(chart) {
+      const {ctx, scales:{x,y}} = chart;
+      const smiX = x.getPixelForValue(SMI);
+      if (smiX < x.left || smiX > x.right) return;
+      ctx.save();
+      ctx.beginPath();
+      ctx.setLineDash([5,4]);
+      ctx.strokeStyle='#f59e0b';
+      ctx.lineWidth=2;
+      ctx.moveTo(smiX, y.top);
+      ctx.lineTo(smiX, y.bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#f59e0b';
+      ctx.font='bold 10px sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText('SMI 2024', smiX, y.top - 6);
+      ctx.restore();
+    }
+  };
+
+  sChartObj = new Chart(document.getElementById('sChart'),{
+    type:'line',
+    plugins:[smiPlugin],
+    data:{ labels, datasets:[
+      { label:'Neto mensual (12p)', data:nets, borderColor:'#059669',
+        backgroundColor:'rgba(5,150,105,.07)', fill:true,
+        tension:.3, yAxisID:'y', pointRadius:0, borderWidth:2.5, order:1 },
+      { label:'IRPF mensual', data:irpfs, borderColor:'#dc2626',
+        backgroundColor:'transparent', fill:false,
+        tension:.3, yAxisID:'y', pointRadius:0, borderWidth:2, order:2 },
+      { label:'Seg. Social mensual', data:sss, borderColor:'#d97706',
+        backgroundColor:'transparent', fill:false,
+        tension:.3, yAxisID:'y', pointRadius:0, borderWidth:2, order:3 },
+      { label:'Tipo efectivo SS+IRPF', data:effs, borderColor:'#7c3aed',
+        backgroundColor:'transparent', fill:false,
+        tension:.3, yAxisID:'y1', pointRadius:0, borderWidth:2,
+        borderDash:[5,4], order:4 },
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ position:'top', labels:{ font:{size:12,weight:'600'}, padding:14 }},
+        tooltip:{
+          backgroundColor:'rgba(255,255,255,.97)', borderColor:'#e2e8f0',
+          borderWidth:1, titleColor:'#1e293b', bodyColor:'#475569', padding:12,
+          callbacks:{
+            title: items => {
+              const g = parseInt(items[0].label);
+              return `Bruto anual: ${g.toLocaleString('es-ES')}€${Math.abs(g-SMI)<200?' ← SMI':''}`;
+            },
+            label: item => item.datasetIndex===3
+              ? `  ${item.dataset.label}: ${item.raw}%`
+              : `  ${item.dataset.label}: ${parseFloat(item.raw).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}€`,
+            afterBody: items => {
+              const r = calc(parseInt(items[0].label));
+              return ['',`  Total deducciones: ${fmt((r.ss+r.irpf)/12)}/mes`,
+                         `  Te quedas con: ${((r.net/r.gross)*100).toFixed(1)}% del bruto`];
+            }
+          }
+        }
+      },
+      scales:{
+        x:{ grid:{color:'#f1f5f9'}, ticks:{
+          callback:(v,i)=>{ const g=labels[i]; return g%10000===0?(g/1000)+'k€':''; },
+          font:{size:11}, maxRotation:0
+        }},
+        y:{ type:'linear', position:'left', grid:{color:'#f1f5f9'},
+          ticks:{ callback:v=>v.toLocaleString('es-ES')+'€', font:{size:11} },
+          title:{display:true,text:'Importe mensual (€)',font:{size:11}}
+        },
+        y1:{ type:'linear', position:'right', grid:{drawOnChartArea:false},
+          ticks:{ callback:v=>v+'%', font:{size:11} },
+          title:{display:true,text:'Tipo efectivo (%)',font:{size:11}}
+        }
+      },
+      onHover:(evt,els)=>{
+        const det = document.getElementById('hover-detail');
+        if (!els||!els.length){ det.classList.add('hid'); return; }
+        const g = labels[els[0].index];
+        const r = calc(g);
+        det.classList.remove('hid');
+        document.getElementById('htitle').textContent = `Bruto anual: ${g.toLocaleString('es-ES')}€`;
+        document.getElementById('hgrid').innerHTML=`
+          <div class="hbox h1"><div class="hl">Bruto/mes</div><div class="hv">${fmt(r.gross/12)}</div></div>
+          <div class="hbox h2"><div class="hl">SS/mes</div><div class="hv">−${fmt(r.ss/12)}</div></div>
+          <div class="hbox h3"><div class="hl">IRPF/mes</div><div class="hv">−${fmt(r.irpf/12)}</div></div>
+          <div class="hbox h4"><div class="hl">Neto/mes</div><div class="hv">${fmt(r.net/12)}</div></div>
+          <div class="hbox h5"><div class="hl">Tipo efectivo</div><div class="hv">${(((r.ss+r.irpf)/r.gross)*100).toFixed(1)}%</div></div>
+        `;
+      }
+    }
+  });
+}
+
+// ════════════════════════════════════════════
+//  EVENTOS
+// ════════════════════════════════════════════
+function onSal(v) {
+  const n = Math.max(0, parseFloat(v)||0);
+  document.getElementById('sl').value = Math.min(n, 120000);
+  updateUI(n);
+}
+function onSl(v) {
+  const n = parseFloat(v)||0;
+  document.getElementById('sal').value = n;
+  updateUI(n);
+}
+function stepSal(delta) {
+  const inp = document.getElementById('sal');
+  const n = Math.max(0, (parseFloat(inp.value)||0) + delta);
+  inp.value = n;
+  onSal(n);
+}
+let _repeatTimer = null;
+let _repeatInterval = null;
+function startRepeat(delta) {
+  stopRepeat();
+  _repeatTimer = setTimeout(() => {
+    _repeatInterval = setInterval(() => stepSal(delta), 80);
+  }, 400);
+}
+function stopRepeat() {
+  clearTimeout(_repeatTimer);
+  clearInterval(_repeatInterval);
+  _repeatTimer = null; _repeatInterval = null;
+}
+function setPays(n) {
+  pays = n;
+  ['p12','p14','pboth'].forEach((id,i)=>
+    document.getElementById(id).classList.toggle('active', [12,14,0][i]===n));
+  updateUI(parseFloat(document.getElementById('sal').value)||0);
+}
+function switchTab(name, btn) {
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pane-'+name).classList.add('active');
+  btn.classList.add('active');
+  if (name==='chart' && !sChartObj) buildSalaryChart();
+}
+
+// ════════════════════════════════════════════
+//  SAVED SALARIES — localStorage
+// ════════════════════════════════════════════
+const LS_KEY = 'irpf_and_saved_v1';
+
+function loadSaved() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+  catch { return []; }
+}
+function persistSaved(arr) {
+  localStorage.setItem(LS_KEY, JSON.stringify(arr));
+}
+
+// Which gross is currently "active" in the calculator
+let activeGross = 27000;
+
+function openSaveForm() {
+  const gross = parseFloat(document.getElementById('sal').value) || 0;
+  document.getElementById('save-form-gross').textContent =
+    gross.toLocaleString('es-ES') + '€';
+  document.getElementById('save-label').value = '';
+  const form = document.getElementById('saved-form');
+  form.classList.add('open');
+  setTimeout(() => document.getElementById('save-label').focus(), 60);
+}
+function closeSaveForm() {
+  document.getElementById('saved-form').classList.remove('open');
+}
+function confirmSave() {
+  const gross = parseFloat(document.getElementById('sal').value) || 0;
+  if (gross <= 0) { closeSaveForm(); return; }
+  const label = document.getElementById('save-label').value.trim()
+                || gross.toLocaleString('es-ES') + '€';
+  const arr = loadSaved();
+  arr.push({ id: Date.now(), gross, label });
+  persistSaved(arr);
+  closeSaveForm();
+  renderSavedList();
+}
+
+function deleteSaved(id, e) {
+  e.stopPropagation();
+  const arr = loadSaved().filter(s => s.id !== id);
+  persistSaved(arr);
+  renderSavedList();
+}
+
+function loadSavedSalary(gross) {
+  activeGross = gross;
+  document.getElementById('sal').value = gross;
+  document.getElementById('sl').value = Math.min(gross, 120000);
+  updateUI(gross);
+  renderSavedList(); // refresh active highlight
+  // Scroll to top of page smoothly
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderSavedList() {
+  const arr = loadSaved();
+  const list = document.getElementById('saved-list');
+  const currentGross = parseFloat(document.getElementById('sal').value) || 0;
+
+  if (arr.length === 0) {
+    list.innerHTML = `<div class="saved-empty">No hay salarios guardados aún.<br>Pulsa "Guardar actual" para añadir uno.</div>`;
+    return;
+  }
+
+  list.innerHTML = arr.map(s => {
+    const r = calc(s.gross);
+    const p = pays === 0 ? 12 : pays;
+    const isActive = Math.abs(s.gross - currentGross) < 1;
+    const dedTag = r.dedSMI > 0
+      ? `<span class="saved-rate" style="color:#059669">Art.80bis −${fmt(r.dedSMI)}</span>`
+      : '';
+    return `
+    <div class="saved-entry ${isActive ? 'active-entry' : ''}"
+         onclick="loadSavedSalary(${s.gross})" title="Cargar ${s.gross.toLocaleString('es-ES')}€">
+      <span class="saved-pin">📌</span>
+      <div class="saved-info">
+        <div class="saved-label">${escHtml(s.label)}</div>
+        <div class="saved-detail">
+          <span class="saved-gross">${s.gross.toLocaleString('es-ES')}€/año</span>
+          <span class="saved-net">↳ ${fmt(r.net/p)}/mes</span>
+          <span class="saved-rate">IRPF ${r.retRate.toFixed(1)}%</span>
+          ${dedTag}
+        </div>
+      </div>
+      <span class="saved-load-hint">cargar →</span>
+      <button class="saved-del" onclick="deleteSaved(${s.id}, event)" title="Eliminar">×</button>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ════════════════════════════════════════════
+// INIT
+updateUI(27000);
+renderSavedList();
+</script>
+</body>
+</html>
