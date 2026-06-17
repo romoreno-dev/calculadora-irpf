@@ -268,12 +268,159 @@
     .hbox.h3{background:#fef2f2;color:#991b1b}.hbox.h4{background:#ecfdf5;color:#065f46}
     .hbox.h5{background:#f5f3ff;color:#5b21b6}
 
+    /* ── TAB 3 TICKET RESTAURANTE ── */
+    .tr-grid{display:grid;grid-template-columns:360px 1fr;gap:1.2rem;align-items:start}
+    .tr-lbl{font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g600);margin-bottom:.3rem;display:block}
+    .tr-lbl-sub{font-size:.7rem;color:var(--g400);margin-top:.3rem;line-height:1.4;display:block}
+    .tr-slider-val{font-size:1.15rem;font-weight:800;color:var(--primary);display:block;text-align:center;margin:.25rem 0}
+    .tr-info-box{background:#fffbeb;border:1.5px solid #fde68a;border-radius:8px;padding:.65rem .85rem;font-size:.8rem;color:#78350f;margin-top:.85rem;line-height:1.5}
+    .tr-info-box strong{color:#92400e}
+    .tr-save-hero{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:2px solid #6ee7b7;border-radius:12px;padding:1.3rem;text-align:center;margin-top:1.1rem}
+    .tr-save-hero .sh-lbl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#065f46;opacity:.7}
+    .tr-save-hero .sh-val{font-size:2.2rem;font-weight:900;color:#059669;display:block;margin:.2rem 0}
+    .tr-save-hero .sh-sub{font-size:.79rem;color:#065f46;opacity:.8;line-height:1.5}
+    .cmp-wrap{overflow-x:auto}
+    .cmp-tbl{width:100%;border-collapse:collapse;font-size:.82rem}
+    .cmp-tbl thead th{background:var(--g100);padding:.55rem .75rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--g600);text-align:right}
+    .cmp-tbl thead th:first-child{text-align:left}
+    .cmp-tbl td{padding:.5rem .75rem;border-bottom:1px solid var(--g100);vertical-align:middle;text-align:right}
+    .cmp-tbl td:first-child{text-align:left;color:var(--g600);font-size:.79rem}
+    .cmp-tbl tr:last-child td{border-bottom:none}
+    .cmp-tbl .div-row td{border-top:2px solid var(--g200);font-weight:700;background:rgba(30,64,175,.03)}
+    .cmp-tbl .hero-row td{background:#eff6ff;border-top:2px solid #bfdbfe;font-size:.88rem;font-weight:800}
+    .cmp-tbl .hero-row td:first-child{color:var(--primary)}
+    .cmp-tbl .total-row td{background:#ecfdf5;border-top:2px solid #a7f3d0;font-size:.92rem;font-weight:800}
+    .cmp-tbl .total-row td:first-child{color:#065f46}
+    .cmp-tbl .zero-val{color:var(--g400);font-weight:400}
+    .cmp-tbl .red-val{color:var(--red);font-weight:700}
+    .cmp-tbl .blue-val{color:var(--primary);font-weight:700}
+    .cmp-tbl .green-val{color:var(--green);font-weight:700}
+    .save-tag{display:inline-block;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:4px;padding:.1rem .4rem;font-size:.73rem;font-weight:700;color:#059669}
+
+    /* ══ RESPONSIVE 820px (tablet / móvil landscape) ══ */
     @media(max-width:820px){
+      /* Layout */
       .g2{grid-template-columns:1fr}
-      .page{padding:1rem}
-      .hdr{padding:1.1rem 1rem;flex-wrap:wrap}
+      .tr-grid{grid-template-columns:1fr}
+      .page{padding:.9rem}
+
+      /* Header */
+      .hdr{padding:1rem;flex-wrap:wrap;gap:.6rem}
+      .hdr h1{font-size:1.05rem}
+      .hdr p{font-size:.7rem}
       .hdr-badge{margin-left:0}
-      .tab-nav{padding:0 1rem;overflow-x:auto}
+
+      /* Tabs */
+      .tab-nav{padding:0 .6rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+      .tab-btn{padding:.7rem .85rem;font-size:.78rem;white-space:nowrap}
+
+      /* Cards */
+      .card{padding:1rem}
+      .card+.card{margin-top:.85rem}
+
+      /* Input salary */
+      .sal-wrap input[type=number]{font-size:1.4rem}
+
+      /* Result boxes */
+      .rbox-mon{font-size:1.15rem}
+
+      /* Charts */
+      .chwrap{height:220px}
+      .chwrap-lg{height:300px}
+
+      /* Stacked bar */
+      .stack-bar{height:28px}
+      .stack-legend{gap:.35rem .7rem}
+      .leg-item{font-size:.68rem}
+
+      /* Staircase: ocultar columna barra y columna /mes */
+      .cbar-track{display:none}
+      .camt.cmon{display:none}
+      .cstair-hdr>span:nth-child(3){display:none}
+      .cstair-hdr>span:nth-child(6){display:none}
+      .cstair-hdr{grid-template-columns:40px 1fr 70px 64px}
+      .cstair-row{grid-template-columns:40px 1fr 70px 64px}
+      .crange{font-size:.67rem}
+      .crange small{font-size:.6rem}
+      .cbadge{font-size:.72rem;padding:.15rem .25rem}
+      .camt{font-size:.74rem}
+
+      /* Funnel pre-escalera */
+      .sfunnel{padding:.5rem .65rem}
+      .sfunnel-row{font-size:.74rem}
+
+      /* Totals strip */
+      .ctotals{font-size:.74rem;gap:.3rem .55rem;padding:.6rem .75rem}
+
+      /* SS breakdown: ocultar barra */
+      .btrack{display:none}
+      .ss-row.hdr>span:nth-child(2){display:none}
+      .ss-row{grid-template-columns:1fr 44px 72px}
+
+      /* Hover detail tab 2 */
+      .hgrid{gap:.4rem}
+      .hbox{padding:.55rem .7rem}
+
+      /* Ticket tab */
+      .cmp-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+      .cmp-tbl{min-width:420px;font-size:.76rem}
+      .cmp-tbl td,.cmp-tbl th{padding:.4rem .5rem}
+
+      /* Saves */
+      .saved-entry{padding:.6rem .9rem}
+    }
+
+    /* ══ RESPONSIVE 500px (móvil portrait) ══ */
+    @media(max-width:500px){
+      .page{padding:.65rem}
+
+      /* Header */
+      .hdr{padding:.85rem}
+      .hdr-ico{font-size:1.6rem}
+      .hdr h1{font-size:.95rem}
+      .hdr p{font-size:.67rem}
+
+      /* Tabs: aún más compactos */
+      .tab-btn{padding:.6rem .7rem;font-size:.72rem}
+
+      /* Input salary */
+      .sal-wrap input[type=number]{font-size:1.2rem}
+      .sal-btn{width:40px;font-size:1.3rem}
+
+      /* Result boxes: 1 columna */
+      .rgrid{grid-template-columns:1fr}
+      .rbox.full{grid-column:span 1}
+      .rbox-mon{font-size:1.05rem}
+
+      /* Charts más pequeños */
+      .chwrap{height:185px}
+      .chwrap-lg{height:250px}
+
+      /* Staircase: quitar también columna Base → solo tipo | tramo | irpf */
+      .camt.cbase{display:none}
+      .cstair-hdr>span:nth-child(4){display:none}
+      .cstair-hdr{grid-template-columns:38px 1fr 62px}
+      .cstair-row{grid-template-columns:38px 1fr 62px}
+      .crange small{display:none}
+      .cbadge{font-size:.68rem}
+
+      /* Funnel: ocultar título largo */
+      .sfunnel-row{font-size:.7rem}
+
+      /* Totals */
+      .ctotals{font-size:.7rem}
+
+      /* Ticket: tabla mínima */
+      .cmp-tbl{min-width:360px;font-size:.72rem}
+      .cmp-tbl small{display:none}
+      .tr-save-hero .sh-val{font-size:1.7rem}
+
+      /* Nota / infobox */
+      .note{font-size:.72rem}
+      .tr-info-box{font-size:.74rem}
+
+      /* SS */
+      .ss-row{font-size:.75rem}
     }
   </style>
 </head>
@@ -293,6 +440,7 @@
 <nav class="tab-nav">
   <button class="tab-btn active" onclick="switchTab('calc',this)">📊 Calculadora</button>
   <button class="tab-btn" onclick="switchTab('chart',this)">📈 Variación Salarios</button>
+  <button class="tab-btn" onclick="switchTab('ticket',this)">🍽️ Ticket Restaurante</button>
 </nav>
 
 <div class="page">
@@ -314,7 +462,7 @@
           <div class="slrow">
             <input type="range" id="sl" min="0" max="120000" step="100" value="27000"
                    oninput="onSl(this.value)">
-            <div class="sl-lbls"><span>0€</span><span>SMI 16.576€</span><span>60k</span><span>120k</span></div>
+            <div class="sl-lbls"><span>0€</span><span>SMI 17.094€</span><span>60k</span><span>120k</span></div>
           </div>
           <div class="pays-g">
             <button class="pays-btn active" id="p12" onclick="setPays(12)">12 pagas</button>
@@ -470,11 +618,84 @@
       </ul>
     </div>
   </div>
+
+  <!-- ══════════ TAB 3: TICKET RESTAURANTE ══════════ -->
+  <div id="pane-ticket" class="pane">
+    <div class="tr-grid">
+
+      <!-- LEFT: inputs -->
+      <div>
+        <div class="card">
+          <div class="ctitle">🍽️ Parámetros — Retribución Flexible</div>
+
+          <div style="margin-bottom:1rem">
+            <span class="tr-lbl">💰 Salario Bruto Anual</span>
+            <div class="sal-wrap">
+              <button class="sal-btn" onclick="trStep(-100)" onmousedown="trStartRepeat(-100)" onmouseup="trStopRepeat()" onmouseleave="trStopRepeat()">−</button>
+              <input type="number" id="tr-sal" value="27000" min="0" max="500000" step="100"
+                     oninput="onTrSal(this.value)">
+              <button class="sal-btn" onclick="trStep(100)" onmousedown="trStartRepeat(100)" onmouseup="trStopRepeat()" onmouseleave="trStopRepeat()">+</button>
+            </div>
+            <div class="slrow">
+              <input type="range" id="tr-sl" min="0" max="120000" step="100" value="27000"
+                     oninput="onTrSl(this.value)">
+              <div class="sl-lbls"><span>0€</span><span>SMI 17.094€</span><span>60k</span><span>120k</span></div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:1rem">
+            <span class="tr-lbl">📅 Días laborables / año</span>
+            <span class="tr-slider-val" id="tr-dias-val">220 días</span>
+            <input type="range" id="tr-dias" min="180" max="260" step="1" value="220"
+                   oninput="onTrDias(this.value)">
+            <div class="sl-lbls"><span>180</span><span>220 (habitual)</span><span>260</span></div>
+            <span class="tr-lbl-sub">Días efectivamente trabajados (excluidos fines de semana, festivos y vacaciones). En EY GDS Spain: ~220 días/año.</span>
+          </div>
+
+          <div>
+            <span class="tr-lbl">🎟️ Importe diario del ticket</span>
+            <span class="tr-slider-val" id="tr-eur-val">11,00 €/día ✓ máx.</span>
+            <input type="range" id="tr-eur" min="1" max="11" step="0.5" value="11"
+                   oninput="onTrEur(this.value)">
+            <div class="sl-lbls"><span>1€</span><span>6€</span><span>11€ (máx.)</span></div>
+            <span class="tr-lbl-sub">Límite exento IRPF: <strong>11€/día laborable</strong> (Art. 45.2 RIRPF, RD 439/2007). El exceso por encima tributa como rendimiento del trabajo.</span>
+          </div>
+
+          <div class="tr-info-box" id="tr-info-box">—</div>
+        </div>
+
+        <div class="tr-save-hero">
+          <div class="sh-lbl">Ahorro fiscal anual total</div>
+          <span class="sh-val" id="tr-sh-val">—</span>
+          <div class="sh-sub" id="tr-sh-sub">—</div>
+        </div>
+
+        <div class="note" style="margin-top:1rem">
+          <strong>Marco legal:</strong> En retribución flexible, el empleado cede parte del bruto a cambio del beneficio en especie. El ticket restaurante (Art. 45.2 RIRPF) está exento de IRPF hasta 11€/día laborable y excluido de la base de cotización a la SS. El empleado percibe menos en nómina pero conserva el mismo poder adquisitivo total <strong>más el ahorro fiscal</strong>
+        </div>
+      </div>
+
+      <!-- RIGHT: comparativa -->
+      <div>
+        <div class="card">
+          <div class="ctitle">📊 Comparativa Sin vs. Con Ticket Restaurante</div>
+          <div class="cmp-wrap" id="tr-cmp">—</div>
+        </div>
+
+
+        <div class="card" style="margin-top:1.1rem">
+          <div class="ctitle">🔢 Detalle del ahorro</div>
+          <ul class="step-ul" id="tr-detail">—</ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <script>
 // ════════════════════════════════════════════
-//  CONSTANTES AEAT + ANDALUCÍA 2024/2025
+//  CONSTANTES AEAT + ANDALUCÍA 2025/2026
 // ════════════════════════════════════════════
 
 const SS_CC  = 0.0470;
@@ -485,7 +706,7 @@ const SS_TOT = SS_CC + SS_DE + SS_FP + SS_MEI; // 0.0648
 
 const GASTOS  = 2000;
 const MIN_PER = 5550;
-const SMI     = 16576;   // SMI 2025/2026: 1.184€/mes × 14 pagas
+const SMI     = 17094;   // SMI 2026: 1.221€/mes × 14 pagas
 
 /*
  * IRPF Andalucía 2024 — tarifa COMBINADA (estatal + autonómica Andalucía)
@@ -533,16 +754,16 @@ function redTrabajo(rnPrev) {
   return 0;
 }
 
-// Deducción por obtención de rendimientos del trabajo (Art. 80 bis LIRPF)
+// Deducción DA 61ª LIRPF (vinculada a la subida del SMI 2026)
 // Se aplica sobre la CUOTA (no sobre la base), reduciendo el IRPF final.
-//   ≤ SMI (16.576€):         340 €
-//   SMI < gross < 18.276€:   lineal → 340 × (18.276 - gross) / 1.700
-//   ≥ 18.276€:               0 €
-const SMI_MAX_DED = 18276;
+//   ≤ SMI (17.094€):              590,89 €
+//   SMI < gross < 20.048,45€:     590,89 − 0,2 × (gross − 17.094)
+//   ≥ 20.048,45€:                 0 €
+const SMI_MAX_DED = 20048.45;
 function deduccionSMI(gross) {
-  if (gross <= SMI)         return 340;
+  if (gross <= SMI)         return 590.89;
   if (gross >= SMI_MAX_DED) return 0;
-  return 340 * (SMI_MAX_DED - gross) / (SMI_MAX_DED - SMI);
+  return 590.89 - 0.2 * (gross - SMI);
 }
 
 function calc(gross) {
@@ -597,8 +818,8 @@ function updateUI(gross) {
     smiBadge.style.display = hasDed ? 'flex' : 'none';
     if (hasDed) {
       const label = r.gross <= SMI
-        ? `✅ Salario ≤ SMI — Deducción Art.80 bis: ${fmt(r.dedSMI)}`
-        : `📉 Deducción SMI parcial (Art.80 bis): ${fmt(r.dedSMI)} (desaparece a los ${SMI_MAX_DED.toLocaleString('es-ES')}€)`;
+        ? `✅ Salario ≤ SMI 2026 — Deducción DA 61ª: ${fmt(r.dedSMI)}`
+        : `📉 Deducción DA 61ª LIRPF (SMI): ${fmt(r.dedSMI)} (desaparece a los ${SMI_MAX_DED.toLocaleString('es-ES')}€)`;
       smiBadge.textContent = label;
     }
   }
@@ -672,7 +893,7 @@ function renderSteps(r, p) {
     {dot:'#10b981', name:'+ Crédito mínimo personal (5.550€)', val:r.taxMin, cls:'pos'},
   );
   if (r.dedSMI > 0) items.push(
-    {dot:'#059669', name:`+ Deducción rendimientos trabajo (Art.80 bis)`, val:r.dedSMI, cls:'pos'}
+    {dot:'#059669', name:`+ Deducción DA 61ª LIRPF (vinculada SMI 2026)`, val:r.dedSMI, cls:'pos'}
   );
   items.push(
     {dot:'#dc2626', name:'= IRPF a retener',       val:-r.irpf,  cls:'neg', div:true},
@@ -794,7 +1015,7 @@ function renderStaircase(r, p) {
   // Totals strip
   const dedSMIHtml = r.dedSMI > 0
     ? `<span class="sep">−</span>
-       <span class="tlbl">Ded. Art.80 bis (SMI):</span>
+       <span class="tlbl">Ded. DA 61ª (SMI 2026):</span>
        <span class="tval tgreen">${fmt(r.dedSMI)}</span>`
     : '';
   document.getElementById('ctotals').innerHTML = `
@@ -814,8 +1035,8 @@ function renderStaircase(r, p) {
   if (redT > 0) note += ` Reducción Art.20: ${fmt(redT)}.`;
   if (r.dedSMI > 0) {
     note += r.gross <= SMI
-      ? ` <strong>Deducción Art.80 bis (SMI): ${fmt(r.dedSMI)}</strong> — protección total para salarios al nivel del SMI.`
-      : ` <strong>Deducción Art.80 bis parcial: ${fmt(r.dedSMI)}</strong> — desaparece progresivamente hasta los ${SMI_MAX_DED.toLocaleString('es-ES')}€.`;
+      ? ` <strong>Deducción DA 61ª LIRPF: ${fmt(r.dedSMI)}</strong> — protección total para salarios al nivel del SMI 2026 (17.094€).`
+      : ` <strong>Deducción DA 61ª parcial: ${fmt(r.dedSMI)}</strong> — desaparece progresivamente hasta los ${SMI_MAX_DED.toLocaleString('es-ES')}€.`;
   }
   document.getElementById('stair-note').innerHTML = note;
 }
@@ -866,7 +1087,7 @@ function updateDonut(r) {
 //  TAB 2 — SALARY CHART
 // ════════════════════════════════════════════
 function buildSalaryChart() {
-  const SMI = 16576;
+  const SMI = 17094;
   const labels=[], nets=[], irpfs=[], sss=[], effs=[];
   for (let g=12000; g<=100000; g+=500) {
     const r = calc(g);
@@ -896,7 +1117,7 @@ function buildSalaryChart() {
       ctx.fillStyle='#f59e0b';
       ctx.font='bold 10px sans-serif';
       ctx.textAlign='center';
-      ctx.fillText('SMI 2024', smiX, y.top - 6);
+      ctx.fillText('SMI 2026', smiX, y.top - 6);
       ctx.restore();
     }
   };
@@ -1019,7 +1240,8 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('pane-'+name).classList.add('active');
   btn.classList.add('active');
-  if (name==='chart' && !sChartObj) buildSalaryChart();
+  if (name==='chart'  && !sChartObj) buildSalaryChart();
+  if (name==='ticket') updateTicketUI();
 }
 
 // ════════════════════════════════════════════
@@ -1117,6 +1339,147 @@ function renderSavedList() {
 
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ════════════════════════════════════════════
+//  TAB 3 — TICKET RESTAURANTE
+// ════════════════════════════════════════════
+let trDias = 220, trEur = 11;
+let _trRepTimer = null, _trRepInterval = null;
+
+function trStep(delta) {
+  const inp = document.getElementById('tr-sal');
+  const n = Math.max(0, (parseFloat(inp.value)||0) + delta);
+  inp.value = n;
+  onTrSal(n);
+}
+function trStartRepeat(delta) {
+  trStopRepeat();
+  _trRepTimer = setTimeout(() => { _trRepInterval = setInterval(() => trStep(delta), 80); }, 400);
+}
+function trStopRepeat() {
+  clearTimeout(_trRepTimer); clearInterval(_trRepInterval);
+  _trRepTimer = null; _trRepInterval = null;
+}
+function onTrSal(v) {
+  const n = Math.max(0, parseFloat(v)||0);
+  document.getElementById('tr-sl').value = Math.min(n, 120000);
+  updateTicketUI();
+}
+function onTrSl(v) {
+  const n = parseFloat(v)||0;
+  document.getElementById('tr-sal').value = n;
+  updateTicketUI();
+}
+function onTrDias(v) {
+  trDias = parseInt(v)||220;
+  document.getElementById('tr-dias-val').textContent = trDias + ' días';
+  updateTicketUI();
+}
+function onTrEur(v) {
+  trEur = parseFloat(v)||11;
+  const disp = trEur.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('tr-eur-val').textContent = disp + ' €/día' + (trEur >= 11 ? ' ✓ máx.' : '');
+  updateTicketUI();
+}
+
+function updateTicketUI() {
+  const gross = parseFloat(document.getElementById('tr-sal').value) || 0;
+  const maxExento   = trDias * 11;
+  const ticketTotal = Math.min(trDias * trEur, maxExento);
+  const grossCon    = Math.max(0, gross - ticketTotal);
+
+  const ticketMes = ticketTotal / 12;  // media mensual (varía ligeramente por días laborables/mes)
+
+  document.getElementById('tr-info-box').innerHTML =
+    `<strong>Máximo exento legal:</strong> ${trDias} días × 11€ = <strong>${maxExento.toLocaleString('es-ES')}€/año</strong>
+     &nbsp;·&nbsp; <strong>Asignas:</strong> ${ticketTotal.toLocaleString('es-ES',{minimumFractionDigits:2})}€/año` +
+    (gross > 0 ? ` (${((ticketTotal/gross)*100).toFixed(1)}% del bruto)` : '') +
+    `<br><small style="opacity:.75">La elección es anual pero el descuento y los tickets se aplican cada mes según los días laborables de ese mes (media: ${fmt(ticketMes)}/mes).</small>`;
+
+  const rSin = calc(gross);
+  const rCon = calc(grossCon);
+
+  const ahorroSS    = rSin.ss   - rCon.ss;
+  const ahorroIRPF  = rSin.irpf - rCon.irpf;
+  const ahorroTotal = ahorroSS  + ahorroIRPF;
+  const netCon      = rCon.net  + ticketTotal;
+
+  // ── Hero: ahorro mensual como cifra principal ──
+  document.getElementById('tr-sh-val').textContent = fmt(ahorroTotal / 12) + '/mes';
+  document.getElementById('tr-sh-sub').innerHTML   =
+    `${fmt(ahorroTotal)}/año &nbsp;·&nbsp; ${fmt(ahorroSS/12)} SS + ${fmt(ahorroIRPF/12)} IRPF (medias mensuales)`;
+
+  // ── Tabla comparativa — cifras MENSUALES medias ──
+  // Nota: base imponible es anual por naturaleza (IRPF es liquidación anual),
+  // pero la retención mensual sí se puede prorratear.
+  const fmtM  = v => fmt(v / 12);  // mensual medio
+  const fmtMA = (v, lbl) =>        // mensual + anual pequeño
+    `${fmt(v/12)}<br><small style="font-weight:500;opacity:.5">${fmt(v)}/año</small>`;
+
+  const rows = [
+    { lbl:'Salario en nómina',                 sin:gross,         con:grossCon,       cls:'blue-val',  save:null,            fmtFn:'ma' },
+    { lbl:'🎟️ Tickets recibidos (exentos)',    sin:null,          con:ticketTotal,    cls:'green-val', save:null,            fmtFn:'ma' },
+    { lbl:'− Seg. Social (6,48%)',              sin:rSin.ss,       con:rCon.ss,        cls:'red-val',   save:ahorroSS,        fmtFn:'ma' },
+    { hero:true,
+      lbl:'📌 Base imponible IRPF (anual)',     sin:rSin.baseLiq,  con:rCon.baseLiq,   cls:'blue-val',  save:rSin.baseLiq-rCon.baseLiq, fmtFn:'yr' },
+    { lbl:'− Retención IRPF',                  sin:rSin.irpf,     con:rCon.irpf,      cls:'red-val',   save:ahorroIRPF,      fmtFn:'ma' },
+    { lbl:'Neto en cuenta',                     sin:rSin.net,      con:rCon.net,       cls:'',          save:null,            fmtFn:'ma' },
+    { lbl:'🎟️ + Tickets (poder adquisitivo)',  sin:null,          con:ticketTotal,    cls:'green-val', save:null,            fmtFn:'ma' },
+    { total:true,
+      lbl:'💰 PODER ADQUISITIVO TOTAL',         sin:rSin.net,      con:netCon,         cls:'green-val', save:ahorroTotal,     fmtFn:'ma' },
+  ];
+
+  const fmtCell = (v, cls, fn) => {
+    if (v == null) return `<span class="zero-val">—</span>`;
+    if (fn === 'yr') return `<span class="${cls}">${fmt(v)}</span>`;
+    return `<span class="${cls}">${fmt(v/12)}</span><br><small style="font-weight:500;opacity:.45">${fmt(v)}/año</small>`;
+  };
+
+  let html = `<div style="font-size:.72rem;color:var(--g600);margin-bottom:.5rem">
+    Cifras mensuales (media). La base imponible IRPF es anual por definición.
+  </div>
+  <table class="cmp-tbl"><thead><tr>
+    <th style="text-align:left;width:40%">Concepto</th>
+    <th>Sin ticket<br><small>/mes (media)</small></th>
+    <th>Con ticket<br><small>/mes (media)</small></th>
+    <th>Ahorro/mes</th>
+  </tr></thead><tbody>`;
+
+  for (const row of rows) {
+    const trCls = row.hero ? 'hero-row' : row.total ? 'total-row' : '';
+    const sinCls = (row.hero || row.total) ? row.cls : '';
+    const saveCell = row.save > 0
+      ? `<span class="save-tag">+${fmt(row.save/12)}<br><small style="font-weight:500;opacity:.6">${fmt(row.save)}/año</small></span>`
+      : `<span class="zero-val">—</span>`;
+    html += `<tr class="${trCls}">
+      <td>${row.lbl}</td>
+      <td>${fmtCell(row.sin, sinCls, row.fmtFn)}</td>
+      <td>${fmtCell(row.con, row.cls, row.fmtFn)}</td>
+      <td>${saveCell}</td>
+    </tr>`;
+  }
+  html += '</tbody></table>';
+  document.getElementById('tr-cmp').innerHTML = html;
+
+  // ── Detalle del ahorro ──
+  const tipoSin = gross    > 0 ? ((rSin.irpf/gross)   *100).toFixed(2) : '0.00';
+  const tipoCon = grossCon > 0 ? ((rCon.irpf/grossCon)*100).toFixed(2) : '0.00';
+  const baseRed = rSin.baseLiq - rCon.baseLiq;
+
+  document.getElementById('tr-detail').innerHTML = [
+    {dot:'#f59e0b', name:`Ahorro SS · ${fmt(ahorroSS/12)}/mes`,    val:fmt(ahorroSS),   cls:'pos'},
+    {dot:'#dc2626', name:`Ahorro IRPF · ${fmt(ahorroIRPF/12)}/mes`,val:fmt(ahorroIRPF), cls:'pos'},
+    {dot:'#059669', name:`AHORRO TOTAL · ${fmt(ahorroTotal/12)}/mes`,val:fmt(ahorroTotal),cls:'big-g', div:true},
+    {dot:'#3b82f6', name:`Base imponible: ${fmt(rSin.baseLiq)} → ${fmt(rCon.baseLiq)}`,
+                                                                     val:'−'+fmt(baseRed),cls:'pos'},
+    {dot:'#ef4444', name:`Tipo efectivo IRPF: ${tipoSin}% → ${tipoCon}%`,
+                                                                     val:`−${(parseFloat(tipoSin)-parseFloat(tipoCon)).toFixed(2)}%`, cls:'pos'},
+  ].map(it=>`<li class="step-li ${it.div?'div':''}">
+    <div class="dot" style="background:${it.dot}"></div>
+    <span class="sname">${it.name}</span>
+    <span class="sval ${it.cls}">${it.val}</span>
+  </li>`).join('');
 }
 
 // ════════════════════════════════════════════
